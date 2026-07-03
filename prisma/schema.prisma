@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AccountType {
+  AVAILABLE
+  ESCROW
+  FAUCET
+  HOUSE
+}
+
+enum TransactionType {
+  SIGNUP
+  DAILY_BONUS
+  TOP_UP
+  ESCROW
+  SETTLE
+  REFUND
+}
+
+model Account {
+  id        String      @id @default(uuid())
+  userId    String?
+  type      AccountType
+  balance   BigInt      @default(0)
+  createdAt DateTime    @default(now())
+  postings  Posting[]
+
+  @@unique([userId, type])
+  @@index([userId])
+}
+
+model Transaction {
+  id             String          @id @default(uuid())
+  type           TransactionType
+  idempotencyKey String          @unique
+  metadata       Json?
+  createdAt      DateTime        @default(now())
+  postings       Posting[]
+}
+
+model Posting {
+  id            String      @id @default(uuid())
+  transactionId String
+  accountId     String
+  amount        BigInt
+  createdAt     DateTime    @default(now())
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account        Account     @relation(fields: [accountId], references: [id])
+
+  @@index([accountId])
+  @@index([transactionId])
+}
