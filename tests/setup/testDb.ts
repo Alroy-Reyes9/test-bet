@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db"
 
 /** Wipe all ledger data between tests. Order respects FKs. */
 export async function resetDb(): Promise<void> {
-  await prisma.$executeRawUnsafe(`TRUNCATE "Posting", "Transaction", "Account" RESTART IDENTITY CASCADE`)
+  await prisma.$executeRawUnsafe(`TRUNCATE "Posting", "Transaction", "Account", "CrashRound" RESTART IDENTITY CASCADE`)
 }
 
 /** Create the singleton FAUCET and HOUSE system accounts. */

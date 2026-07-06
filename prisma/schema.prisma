@@ -60,3 +60,27 @@ model Posting {
   @@index([accountId])
   @@index([transactionId])
 }
+
+enum CrashStatus {
+  RUNNING
+  CASHED_OUT
+  BUSTED
+}
+
+model CrashRound {
+  id                String      @id @default(uuid())
+  userId            String
+  stake             BigInt
+  clientSeed        String
+  serverSeed        String
+  commitHash        String
+  crashPoint        Int         // hundredths, hidden from client until settled
+  autoCashout       Int?        // hundredths
+  status            CrashStatus @default(RUNNING)
+  startedAt         DateTime    @default(now())
+  cashoutMultiplier Int?        // hundredths
+  payout            BigInt?
+  settledAt         DateTime?
+
+  @@index([userId, startedAt])
+}
